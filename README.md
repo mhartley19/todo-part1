@@ -1,68 +1,140 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Assessment: Todos Part 1
 
-## Available Scripts
+Fork then clone this repository: [https://gitlab.com/vstlouis.kenzie/todo-app-pt-1](https://gitlab.com/vstlouis.kenzie/todo-app-pt-1)
 
-In the project directory, you can run:
+For this assessment, you'll be extending a todo application such that users can actually interact with it.
 
-### `yarn start`
+Here's what the final product should look like:
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+<img src="https://s3.us-east-2.amazonaws.com/files.kenzie.academy/frontend-q2/todo-part-1.gif" alt="example output" height="400px" />
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+In doing so, you'll be demonstrating a basic understanding of the following:
 
-### `yarn test`
+- modifying component-specific values using state
+- responding to user interactions by using event handlers and component methods
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Event handlers can be written in a variety of ways.
 
-### `yarn build`
+What is most important to understand is how to bind them properly to the component instance.
+You may see a few different ways.
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```jsx
+// ES6 style
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
+class MyComponent extends Component {
+  state = {
+    on: false
+  }
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+  handleToggle = event => {
+    this.setState(state => ({
+      on: !state.on;
+    }));
+  };
 
-### `yarn eject`
+  render() {
+    return (
+      <React.Fragment>
+        <h1>Toggle is {this.state.on ? "on" : "off"}</h1>
+        <button onClick={this.handleToggle}>Click Me</button>
+      </React.Fragment>
+    );
+  }
+}
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+The ES6 style is preferred. Proper binding, using one of the patterns above, is required when the handler must refer to any properties or methods on the component instance. Remember, properties/methods on the instance are accessed using `this` when writing instance methods. It is very common that you will need `this.setState` method inside an event handler method.
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+The complexity of event handlers can increase when working with lists of components where each component needs its own "parameterized" version of the event handler.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+Consider how the `handleDelete` method below works.
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+```jsx
+class MyComponent extends Component {
+  state = {
+    accounts: [{ id: 2938 }, { id: 3874 }, { id: 6984 }]
+  }
 
-## Learn More
+  handleDelete = accountId => event => {
+    const newAccounts = this.state.accounts.filter(
+      account => account.id !== accountId
+    )
+    this.setState({ accounts: newAccounts })
+  }
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+  render () {
+    return (
+      <React.Fragment>
+        <h1>Active Accounts</h1>
+        {this.state.accounts.map(account => (
+          <div>
+            <p>Account: {account.id}</p>
+            <button onClick={this.handleDelete(account.id)}>
+              Delete Account
+            </button>
+          </div>
+        ))}
+      </React.Fragment>
+    )
+  }
+}
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+Two things to notice: `handleDelete` method is actually a function inside of a function (using two fat arrows). The first function is called with the `account.id` (you can see the first call in the button `onClick`). This creates a closure in which `accountId` is saved along with the return value, which is the inner function of `handleDelete`. React will hand off this function closure to the DOM. The DOM then calls the inner function, passing in the `event` object when the user clicks one of the buttons. When the inner function runs, its value for `accountId` will contain the correct id for the button that was clicked.
 
-### Code Splitting
+The `handleDelete` example below works the same, however, it is written to take two parameters at once instead of one in the first call and one in the second.
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
+```js
+class MyComponent extends Component {
+  state = {
+    accounts: [{ id: 2938 }, { id: 3874 }, { id: 6984 }]
+  }
 
-### Analyzing the Bundle Size
+  handleDelete = (event, accountId) => {
+    const newAccounts = this.state.accounts.filter(
+      account => account.id !== accountId
+    )
+    this.setState({ accounts: newAccounts })
+  }
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
+  render () {
+    return (
+      <React.Fragment>
+        <h1>Active Accounts</h1>
+        {this.state.accounts.map(account => (
+          <div>
+            <p>Account: {account.id}</p>
+            <button onClick={event => this.handleDelete(event, account.id)}>
+              Delete Account
+            </button>
+          </div>
+        ))}
+      </React.Fragment>
+    )
+  }
+}
+```
 
-### Making a Progressive Web App
+## Acceptance Criteria
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
+### User Can Add a Todo:
 
-### Advanced Configuration
+When a user types into the top input and hits the Enter/return key, it should add it as a todo and empty the input.
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
+### User can mark a todo as complete:
 
-### Deployment
+When a user clicks on the circle at the beginning of a todo it will toggle whether that todo is completed or not.
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
+### User Can Delete a Todo:
 
-### `yarn build` fails to minify
+When a user clicks the "X" on the right of a Todo, it removes it from the list.
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+### User Can Delete all Todos Marked as Complete:
+
+When a user clicks the button 'Clear Completed' it will delete all todos that are marked as complete.
+
+## Submission
+
+You **will** be required to submit a deployed application. If you instead
+submit a link to a repository (that is, only code), you _will_ be awarded
+**0** points.
