@@ -135,6 +135,4 @@ When a user clicks the button 'Clear Completed' it will delete all todos that ar
 
 ## Submission
 
-You **will** be required to submit a deployed application. If you instead
-submit a link to a repository (that is, only code), you _will_ be awarded
-**0** points.
+You **will** be required to submit a link to your repository (that is, only code)
