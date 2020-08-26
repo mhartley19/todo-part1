@@ -6,39 +6,7 @@ import uuid from 'react-uuid'
 
 
 const App = () => {
-
-
-  
-   
-   
-
-  
-
-    
-    return (
-
-      <section className="todoapp">
-        <header className="header">
-          <h1>todos</h1>
-         <input className="new-todo" type="inputBox" id="input"
-        onKeyDown = {event => pressEnter(event)}
-         placeholder="What needs to be done?" autoFocus />
-        </header>
-        <TodoList todos={todos} />
-        <footer className="footer">
-          <span className="todo-count">
-            <strong>0</strong> item(s) left
-          </span>
-          <button className="clear-completed">Clear completed</button>
-        </footer>
-      </section>
-    );
-    
-}
-
-
-
-const TodoList = (props) => {
+  const [todos, setTodos] = useState(todosList)
   const pressEnter = (event) => {
     if(event.which === 13){
       let newTodos = [...todos]
@@ -55,15 +23,39 @@ const TodoList = (props) => {
     }
     
 }
+const handleDelete = (todoId) => {
+  
+  const newTodos = todos.filter(
+    todoItem => todoItem.id !== todoId
+  )
+  setTodos(newTodos)
+}
 
-  const [todos, setTodos] = useState(todosList)
+    
+    return (
 
-  const handleDelete = (todoId) => {
-    const newTodos = todos.filter(
-      todoItem => todoItem.id !== todoId
-    )
-    setTodos(newTodos)
-  }
+      <section className="todoapp">
+        <header className="header">
+          <h1>todos</h1>
+         <input className="new-todo" type="inputBox" id="input"
+        onKeyDown = {event => pressEnter(event)}
+         placeholder="What needs to be done?" autoFocus />
+        </header>
+        <TodoList todos={todos} handleDelete={handleDelete} />
+        <footer className="footer">
+          <span className="todo-count">
+            <strong>0</strong> item(s) left
+          </span>
+          <button className="clear-completed">Clear completed</button>
+        </footer>
+      </section>
+    );ç
+    
+}
+
+
+const TodoList = (props) => {
+  
 
     return (
       <section className="main">
@@ -71,7 +63,7 @@ const TodoList = (props) => {
           {props.todos.map((todo) => (
             <>
             <TodoItem  title={todo.title} completed={todo.completed} 
-            id ={todo.id} handleDelete={handleDelete} />
+            id ={todo.id}  handleDelete={props.handleDelete}/>
             
             
             </>
