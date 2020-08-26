@@ -1,18 +1,30 @@
-import React, { Component } from "react";
+import React, { Component, useState, useEffect } from "react";
 import todosList from "./todos.json";
+import uuid from 'react-uuid'
 
-class App extends Component {
-  state = {
-    todos: todosList,
-  };
-  render() {
+
+
+
+const App = () => {
+
+
+  
+   
+   
+
+  
+
+    
     return (
+
       <section className="todoapp">
         <header className="header">
           <h1>todos</h1>
-          <input className="new-todo" placeholder="What needs to be done?" autofocus />
+         <input className="new-todo" type="inputBox" id="input"
+        onKeyDown = {event => pressEnter(event)}
+         placeholder="What needs to be done?" autoFocus />
         </header>
-        <TodoList todos={this.state.todos} />
+        <TodoList todos={todos} />
         <footer className="footer">
           <span className="todo-count">
             <strong>0</strong> item(s) left
@@ -21,35 +33,78 @@ class App extends Component {
         </footer>
       </section>
     );
-  }
+    
 }
 
-class TodoItem extends Component {
-  render() {
-    return (
-      <li className={this.props.completed ? "completed" : ""}>
-        <div className="view">
-          <input className="toggle" type="checkbox" checked={this.props.completed} />
-          <label>{this.props.title}</label>
-          <button className="destroy" />
-        </div>
-      </li>
-    );
-  }
+
+
+const TodoList = (props) => {
+  const pressEnter = (event) => {
+    if(event.which === 13){
+      let newTodos = [...todos]
+      let newTodo =   {
+        "userId": 1,
+        "id": 100,
+        "title": event.target.value,
+        "completed": false
+      }
+      newTodos.push(newTodo)
+      setTodos(newTodos)
+     
+
+    }
+    
 }
 
-class TodoList extends Component {
-  render() {
+  const [todos, setTodos] = useState(todosList)
+
+  const handleDelete = (todoId) => {
+    const newTodos = todos.filter(
+      todoItem => todoItem.id !== todoId
+    )
+    setTodos(newTodos)
+  }
+
     return (
       <section className="main">
         <ul className="todo-list">
-          {this.props.todos.map((todo) => (
-            <TodoItem title={todo.title} completed={todo.completed} />
+          {props.todos.map((todo) => (
+            <>
+            <TodoItem  title={todo.title} completed={todo.completed} 
+            id ={todo.id} handleDelete={handleDelete} />
+            
+            
+            </>
           ))}
+
         </ul>
       </section>
-    );
+    )
+          }
+
+  const TodoItem = (props) => {
+    
+    const [inputBox, setinputBox] = useState('')
+    
+  
+   
+  
+      return (
+        <li className={props.completed ? "completed" : ""} key = {uuid()}>
+          <div className="view">
+            <input
+            className="toggle" type="checkbox" checked={props.completed} 
+            id={props.id}/>
+            <label>{props.title}</label>
+            <button className="destroy" onClick={props.handleDelete} />
+          </div>
+        </li>
+      );
+    
   }
-}
+
+
 
 export default App;
+
+
