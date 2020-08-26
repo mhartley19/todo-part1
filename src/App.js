@@ -15,7 +15,7 @@ class App extends Component {
    
   }
 
-  handleClearCompleted = (todoId) => {
+  handleClearCompleted = () => {
     console.log("clicked")
     const newTodos = this.state.todos.filter(
       eachItem => eachItem.completed === false
@@ -24,14 +24,18 @@ class App extends Component {
    
   }
 
-  handleCheck = (todoId) => {
+  handleCheck = (id) => {
     console.log("checked")
     const newTodos = this.state.todos.map(
-    eachItem => eachItem.completed = !eachItem.completed
-    )
-    this.setState( {todos:newTodos})
+    eachItem => {
+      if(eachItem.id === id){
+        eachItem.completed = !eachItem.completed
+      }
+      })
+    
+    this.setState( {newTodos} )
   }
-
+  
   render() {
     return (
       <section className="todoapp">
@@ -81,10 +85,14 @@ class TodoItem extends Component {
     return (
       <li className={this.props.completed ? "completed" : ""}>
         <div className="view">
-          <input className="toggle" type="checkbox" checked={this.props.completed}
+          <input className="toggle" 
+          type="checkbox" 
+          checked={this.props.completed}
           onChange = {() => this.props.handleCheck(this.props.id)}/>
+          
           <label>{this.props.title}</label>
-          <button className="destroy" onClick={()=>this.props.handleDelete(this.props.id)} />
+          <button className="destroy" 
+          onClick={()=>this.props.handleDelete(this.props.id)} />
         </div>
       </li>//Getting title from TodoList (todo.title) getting checked from completed in ToDoList
       //
