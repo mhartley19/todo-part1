@@ -1,9 +1,11 @@
 import React, { Component } from "react";
 import todosList from "./todos.json";
+import{v4 as uuid} from "uuid"
 
 class App extends Component {
   state = {
     todos: todosList,
+    value: ""
   };
 
   handleDelete = (todoId) => {
@@ -35,13 +37,30 @@ class App extends Component {
     
     this.setState( {newTodos} )
   }
-  
+
+  handleAddItem = (event) => {
+    
+   if(event.which === 13){
+     let newTodos = [...this.state.todos]
+     let newTodo = {"userId": 1,
+     "id": uuid(),
+     "title": this.state.value,
+     "completed": false
+   }
+   newTodos.push(newTodo)
+   this.setState({todos: newTodos})
+   
+   }
+   
+  }
+
+
   render() {
     return (
       <section className="todoapp">
         <header className="header">
           <h1>todos</h1>
-          <input className="new-todo" placeholder="What needs to be done?" autofocus />
+          <input id="inputBox" onChange= {(event) => this.setState({value: event.target.value})} onKeyDown ={(event) => this.handleAddItem(event)} className="new-todo" placeholder="What needs to be done?" autoFocus />
         </header>
         <TodoList todos={this.state.todos} 
         handleCheck={this.handleCheck}
@@ -49,7 +68,7 @@ class App extends Component {
         <footer className="footer">
           {/* todos is recieved from current state of todos: todosList */}
           <span className="todo-count">
-            
+
             <strong>0</strong> item(s) left
           </span>
           <button onClick={() => this.handleClearCompleted(this.state.todos.id)} 
