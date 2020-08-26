@@ -1,102 +1,95 @@
-import React, { Component, useState, useEffect } from "react";
+import React, { Component } from "react";
 import todosList from "./todos.json";
-import uuid from 'react-uuid'
 
+class App extends Component {
+  state = {
+    todos: todosList,
+  };
 
-
-
-const App = () => {
-  const [todos, setTodos] = useState(todosList)
-  const pressEnter = (event) => {
-    if(event.which === 13){
-      let newTodos = [...todos]
-      let newTodo =   {
-        "userId": 1,
-        "id": 100,
-        "title": event.target.value,
-        "completed": false
-      }
-      newTodos.push(newTodo)
-      setTodos(newTodos)
-     
-
-    }
+  handleDelete = (todoId) => {
     
-}
-const handleDelete = (todoId) => {
-  
-  const newTodos = todos.filter(
-    todoItem => todoItem.id !== todoId
-  )
-  setTodos(newTodos)
-}
+    const newTodos = this.state.todos.filter(
+      eachItem => eachItem.id !== todoId
+    )
+    this.setState({ todos: newTodos })
+   
+  }
 
-    
+  handleClearCompleted = (todoId) => {
+    console.log("clicked")
+    const newTodos = this.state.todos.filter(
+      eachItem => eachItem.completed === false
+    )
+    this.setState({ todos: newTodos })
+   
+  }
+
+  handleCheck = (todoId) => {
+    console.log("checked")
+    const newTodos = this.state.todos.map(
+    eachItem => eachItem.completed = !eachItem.completed
+    )
+    this.setState( {todos:newTodos})
+  }
+
+  render() {
     return (
-
       <section className="todoapp">
         <header className="header">
           <h1>todos</h1>
-         <input className="new-todo" type="inputBox" id="input"
-        onKeyDown = {event => pressEnter(event)}
-         placeholder="What needs to be done?" autoFocus />
+          <input className="new-todo" placeholder="What needs to be done?" autofocus />
         </header>
-        <TodoList todos={todos} handleDelete={handleDelete} />
+        <TodoList todos={this.state.todos} 
+        handleCheck={this.handleCheck}
+        handleDelete={this.handleDelete}/>
         <footer className="footer">
+          {/* todos is recieved from current state of todos: todosList */}
           <span className="todo-count">
+            
             <strong>0</strong> item(s) left
           </span>
-          <button className="clear-completed">Clear completed</button>
+          <button onClick={() => this.handleClearCompleted(this.state.todos.id)} className="clear-completed">Clear completed</button>
         </footer>
       </section>
-    );ç
-    
+    );
+  }
 }
 
-
-const TodoList = (props) => {
-  
-
+class TodoList extends Component {
+  render() {
     return (
       <section className="main">
         <ul className="todo-list">
-          {props.todos.map((todo) => (
-            <>
-            <TodoItem  title={todo.title} completed={todo.completed} 
-            id ={todo.id}  handleDelete={props.handleDelete}/>
-            
-            
-            </>
+          {this.props.todos.map((todo) => (
+            <TodoItem title={todo.title} 
+            completed={todo.completed}
+            handleCheck ={this.props.handleCheck}
+            handleDelete={this.props.handleDelete}
+            id={todo.id}
+             />
+            //title and completed get passed down as props, and the value is recieved
+            //from the todos.map looping over json array
           ))}
-
         </ul>
       </section>
-    )
-          }
-
-  const TodoItem = (props) => {
-    
-    const [inputBox, setinputBox] = useState('')
-    
-  
-   
-  
-      return (
-        <li className={props.completed ? "completed" : ""} key = {uuid()}>
-          <div className="view">
-            <input
-            className="toggle" type="checkbox" checked={props.completed} 
-            id={props.id}/>
-            <label>{props.title}</label>
-            <button className="destroy" onClick={props.handleDelete} />
-          </div>
-        </li>
-      );
-    
+    );
   }
+}
 
-
+class TodoItem extends Component {
+  render() {
+    return (
+      <li className={this.props.completed ? "completed" : ""}>
+        <div className="view">
+          <input className="toggle" type="checkbox" checked={this.props.completed}
+          onChange = {() => this.props.handleCheck(this.props.id)}/>
+          <label>{this.props.title}</label>
+          <button className="destroy" onClick={()=>this.props.handleDelete(this.props.id)} />
+        </div>
+      </li>//Getting title from TodoList (todo.title) getting checked from completed in ToDoList
+      //
+    );
+  }
+}
 
 export default App;
-
-
