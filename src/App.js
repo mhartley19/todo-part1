@@ -52,7 +52,8 @@ class App extends Component {
             
             <strong>0</strong> item(s) left
           </span>
-          <button onClick={() => this.handleClearCompleted(this.state.todos.id)} className="clear-completed">Clear completed</button>
+          <button onClick={() => this.handleClearCompleted(this.state.todos.id)} 
+          className="clear-completed">Clear completed</button>
         </footer>
       </section>
     );
@@ -91,6 +92,7 @@ class TodoItem extends Component {
           onChange = {() => this.props.handleCheck(this.props.id)}/>
           
           <label>{this.props.title}</label>
+          
           <button className="destroy" 
           onClick={()=>this.props.handleDelete(this.props.id)} />
         </div>
