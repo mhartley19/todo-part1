@@ -1,20 +1,41 @@
-import React, { Component } from "react";
+import React, { Component } from "react"
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link
+} from "react-router-dom";
 import todosList from "./todos.json";
-import{v4 as uuid} from "uuid"
+import { v4 as uuid } from "uuid"
+import TodoItem from "./components/TodoItem"
+import TodoList from './components/TodoList'
+
 
 class App extends Component {
   state = {
     todos: todosList,
-    value: ""
+    value: "",
+    itemCount: todosList.length
   };
+  
+
+  handleItemCount = () => {
+    let itemCounter = this.state.todos.filter(
+      eachItem => eachItem.completed === false
+    )
+    this.setState({ itemCount: itemCounter })
+    
+  }
 
   handleDelete = (todoId) => {
-    
+
     const newTodos = this.state.todos.filter(
       eachItem => eachItem.id !== todoId
     )
     this.setState({ todos: newTodos })
-   
+    this.setState({ itemCount: newTodos.length })
+    
+
   }
 
   handleClearCompleted = () => {
@@ -23,102 +44,104 @@ class App extends Component {
       eachItem => eachItem.completed === false
     )
     this.setState({ todos: newTodos })
-   
+    this.setState({ itemCount: newTodos.length })
+
   }
 
   handleCheck = (id) => {
     console.log("checked")
     const newTodos = this.state.todos.map(
-    eachItem => {
-      if(eachItem.id === id){
-        eachItem.completed = !eachItem.completed
-      }
+      eachItem => {
+        if (eachItem.id === id) {
+          eachItem.completed = !eachItem.completed
+          
+        }
+        
       })
+
+    this.setState({ newTodos })
+    this.setState({ itemCount: newTodos.length })
     
-    this.setState( {newTodos} )
   }
 
   handleAddItem = (event) => {
-    
-   if(event.which === 13){
-     let newTodos = [...this.state.todos]
-     let newTodo = {"userId": 1,
-     "id": uuid(),
-     "title": this.state.value,
-     "completed": false
-   }
-   newTodos.push(newTodo)
-   this.setState({todos: newTodos})
-   
-   }
-   
+
+    if (event.which === 13) {
+      let newTodos = [...this.state.todos]
+      let newTodo = {
+        "userId": 1,
+        "id": uuid(),
+        "title": this.state.value,
+        "completed": false
+      }
+      newTodos.push(newTodo)
+      this.setState({ todos: newTodos })
+      this.setState({ itemCount: newTodos.length })
+
+    }
+
   }
 
 
+  // }
+
   render() {
     return (
+      <Router>
       <section className="todoapp">
         <header className="header">
           <h1>todos</h1>
-          <input id="inputBox" onChange= {(event) => this.setState({value: event.target.value})} onKeyDown ={(event) => this.handleAddItem(event)} className="new-todo" placeholder="What needs to be done?" autoFocus />
+          <input id="inputBox" onChange={(event) => this.setState({ value: event.target.value })} onKeyDown={(event) => this.handleAddItem(event)} className="new-todo" placeholder="What needs to be done?" autoFocus />
         </header>
-        <TodoList todos={this.state.todos} 
-        handleCheck={this.handleCheck}
-        handleDelete={this.handleDelete}/>
+        <Switch>
+      <Route exact path="/" >
+      <TodoList todos={this.state.todos}
+          handleCheck={this.handleCheck}
+          handleDelete={this.handleDelete}
+          />
+      </Route>
+      <Route path="/active">
+      <TodoList todos={this.state.todos.filter(todo => todo.completed === false)}
+      handleCheck={this.handleCheck}
+      handleDelete={this.handleDelete}
+         />
+      </Route>
+      <Route path="/completed">
+      <TodoList todos={this.state.todos.filter(todo => todo.completed === true)}
+      handleCheck={this.handleCheck}
+      handleDelete={this.handleDelete}
+          />
+      </Route>
+    </Switch>
         <footer className="footer">
-          {/* todos is recieved from current state of todos: todosList */}
+          {/* <!-- This should be `0 items left` by default --> */}
           <span className="todo-count">
-
-            <strong>0</strong> item(s) left
-          </span>
-          <button onClick={() => this.handleClearCompleted(this.state.todos.id)} 
-          className="clear-completed">Clear completed</button>
+            <strong>{this.state.itemCount}</strong> item(s) left
+  </span>
+  
+          <ul className="filters">
+            <li>
+              <Link to ="/">All</Link>
+            </li>
+            <li>
+              <Link to="/active">Active</Link>
+            </li>
+            <li>
+              <Link to="/completed">Completed</Link>
+            </li>
+          </ul>
+   
+          
+          <button onClick={() => this.handleClearCompleted(this.state.todos.id)}
+            className="clear-completed">Clear completed</button>
+ 
         </footer>
       </section>
+      </Router>
     );
   }
 }
 
-class TodoList extends Component {
-  render() {
-    return (
-      <section className="main">
-        <ul className="todo-list">
-          {this.props.todos.map((todo) => (
-            <TodoItem title={todo.title} 
-            completed={todo.completed}
-            handleCheck ={this.props.handleCheck}
-            handleDelete={this.props.handleDelete}
-            id={todo.id}
-             />
-            //title and completed get passed down as props, and the value is recieved
-            //from the todos.map looping over json array
-          ))}
-        </ul>
-      </section>
-    );
-  }
-}
 
-class TodoItem extends Component {
-  render() {
-    return (
-      <li className={this.props.completed ? "completed" : ""}>
-        <div className="view">
-          <input className="toggle" 
-          type="checkbox" 
-          checked={this.props.completed}
-          onChange = {() => this.props.handleCheck(this.props.id)}/>
-          
-          <label>{this.props.title}</label>
-          
-          <button className="destroy" 
-          onClick={()=>this.props.handleDelete(this.props.id)} />
-        </div>
-      </li>//Getting title from TodoList (todo.title) getting checked from completed in ToDoList
-      //
-    );
-  }
-}
 
 export default App;
